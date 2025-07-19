@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Gradient Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: stripe-move 3s linear infinite;
+        }
+
+        @keyframes stripe-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 28px 0; }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .gradient-preview {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview-area {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .preview-area:hover .preview-overlay {
+            opacity: 1;
+        }
+
+        .controls-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .gradient-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .gradient-type {
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .gradient-type.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .direction-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .direction-input {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .direction-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .radial-controls {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .radial-controls.show {
+            display: grid;
+        }
+
+        .color-stops {
+            margin-bottom: 20px;
+        }
+
+        .color-stop {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .color-stop:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .color-input {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .position-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .remove-color {
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .remove-color:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .add-color {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .add-color:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .preset-gradients {
+            margin-bottom: 20px;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .preset-item {
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .preset-item:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .output-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .output-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: var(--bg-primary);
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .output-tab {
+            flex: 1;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .output-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .code-output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--info-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .action-btn.success {
+            background: var(--success-color);
+        }
+
+        .randomize-btn {
+            background: var(--warning-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .randomize-btn:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .slider-group {
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .gradient-preview {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .gradient-types {
+                grid-template-columns: 1fr;
+            }
+
+            .direction-controls,
+            .radial-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .preset-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .output-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            <h1><i class="fas fa-palette"></i> CSS Gradient Generator</h1>
+            <p>Create beautiful gradients with live preview and CSS code export</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-section">
+                <div class="control-group">
+                    <label class="control-label">Gradient Type</label>
+                    <div class="gradient-types">
+                        <div class="gradient-type active" data-type="linear">Linear</div>
+                        <div class="gradient-type" data-type="radial">Radial</div>
+                        <div class="gradient-type" data-type="conic">Conic</div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="linearControls">
+                    <label class="control-label">Direction</label>
+                    <div class="direction-controls">
+                        <select class="direction-input" id="directionSelect">
+                            <option value="90deg">To Right (90deg)</option>
+                            <option value="0deg">To Top (0deg)</option>
+                            <option value="180deg">To Bottom (180deg)</option>
+                            <option value="270deg">To Left (270deg)</option>
+                            <option value="45deg">To Top Right (45deg)</option>
+                            <option value="135deg">To Bottom Right (135deg)</option>
+                            <option value="225deg">To Bottom Left (225deg)</option>
+                            <option value="315deg">To Top Left (315deg)</option>
+                        </select>
+                        <input type="number" class="direction-input" id="customAngle" placeholder="Custom angle" min="0" max="360">
+                    </div>
+                </div>
+
+                <div class="control-group radial-controls" id="radialControls">
+                    <label class="control-label">Radial Settings</label>
+                    <div class="radial-controls show">
+                        <select class="direction-input" id="radialShape">
+                            <option value="ellipse">Ellipse</option>
+                            <option value="circle">Circle</option>
+                        </select>
+                        <select class="direction-input" id="radialSize">
+                            <option value="farthest-corner">Farthest Corner</option>
+                            <option value="closest-corner">Closest Corner</option>
+                            <option value="farthest-side">Farthest Side</option>
+                            <option value="closest-side">Closest Side</option>
+                        </select>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Center X</span>
+                            <span id="centerXValue">50%</span>
+                        </div>
+                        <input type="range" class="slider" id="centerX" min="0" max="100" value="50">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Center Y</span>
+                            <span id="centerYValue">50%</span>
+                        </div>
+                        <input type="range" class="slider" id="centerY" min="0" max="100" value="50">
+                    </div>
+                </div>
+
+                <div class="control-group" id="conicControls" style="display: none;">
+                    <label class="control-label">Conic Settings</label>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Rotation</span>
+                            <span id="conicRotationValue">0°</span>
+                        </div>
+                        <input type="range" class="slider" id="conicRotation" min="0" max="360" value="0">
+                    </div>
+                </div>
+
+                <button class="randomize-btn" onclick="randomizeGradient()">
+                    <i class="fas fa-random"></i>
+                    Randomize Gradient
+                </button>
+
+                <div class="control-group">
+                    <label class="control-label">Color Stops</label>
+                    <div class="color-stops" id="colorStops">
+                        <!-- Color stops will be dynamically added here -->
+                    </div>
+                    <button class="add-color" onclick="addColorStop()">
+                        <i class="fas fa-plus"></i>
+                        Add Color Stop
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Preset Gradients</label>
+                    <div class="preset-gradients">
+                        <div class="preset-grid" id="presetGrid">
+                            <!-- Preset gradients will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gradient-preview">
+                <div class="preview-area" id="previewArea">
+                    <div class="preview-overlay">Click to copy CSS</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-tabs">
+                <button class="output-tab active" data-output="css">CSS</button>
+                <button class="output-tab" data-output="scss">SCSS</button>
+                <button class="output-tab" data-output="background">Background Only</button>
+            </div>
+
+            <div class="code-output" id="codeOutput"></div>
+
+            <div class="output-actions">
+                <button class="action-btn" onclick="copyCode()">
+                    <i class="fas fa-copy"></i>
+                    Copy Code
+                </button>
+                <button class="action-btn" onclick="downloadCSS()">
+                    <i class="fas fa-download"></i>
+                    Download CSS
+                </button>
+                <button class="action-btn" onclick="exportAsImage()">
+                    <i class="fas fa-image"></i>
+                    Export as Image
+                </button>
+                <button class="action-btn" onclick="shareGradient()">
+                    <i class="fas fa-share-alt"></i>
+                    Share URL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'light';
+        let gradientType = 'linear';
+        let colorStops = [
+            { color: '#ff6b6b', position: 0 },
+            { color: '#4ecdc4', position: 100 }
+        ];
+        let currentOutputType = 'css';
+
+        // Preset gradients
+        const presetGradients = [
+            { colors: ['#ff6b6b', '#4ecdc4'], name: 'Sunset' },
+            { colors: ['#667eea', '#764ba2'], name: 'Purple Bliss' },
+            { colors: ['#f093fb', '#f5576c'], name: 'Sweet Dreams' },
+            { colors: ['#4facfe', '#00f2fe'], name: 'Blue Lagoon' },
+            { colors: ['#43e97b', '#38f9d7'], name: 'Fresh Mint' },
+            { colors: ['#fa709a', '#fee140'], name: 'Peach' },
+            { colors: ['#a8edea', '#fed6e3'], name: 'Cotton Candy' },
+            { colors: ['#ff9a9e', '#fecfef', '#fecfef'], name: 'Pink Paradise' },
+            { colors: ['#a1c4fd', '#c2e9fb'], name: 'Clear Sky' },
+            { colors: ['#ffecd2', '#fcb69f'], name: 'Orange Coral' },
+            { colors: ['#ff8a80', '#ea80fc'], name: 'Electric' },
+            { colors: ['#8fd3f4', '#84fab0'], name: 'Aqua Marine' }
+        ];
+
+        // Theme management
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            
+            const icon = document.getElementById('themeToggle').querySelector('i');
+            icon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            currentTheme = savedTheme;
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            const icon = document.getElementById('themeToggle').querySelector('i');
+            icon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            initializeEventListeners();
+            renderColorStops();
+            renderPresets();
+            updateGradient();
+        });
+
+        function initializeEventListeners() {
+            // Gradient type selection
+            document.querySelectorAll('.gradient-type').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.gradient-type').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    gradientType = this.getAttribute('data-type');
+                    toggleGradientControls();
+                    updateGradient();
+                });
+            });
+
+            // Direction and angle inputs
+            document.getElementById('directionSelect').addEventListener('change', updateGradient);
+            document.getElementById('customAngle').addEventListener('input', updateGradient);
+
+            // Radial controls
+            document.getElementById('radialShape').addEventListener('change', updateGradient);
+            document.getElementById('radialSize').addEventListener('change', updateGradient);
+            document.getElementById('centerX').addEventListener('input', function() {
+                document.getElementById('centerXValue').textContent = this.value + '%';
+                updateGradient();
+            });
+            document.getElementById('centerY').addEventListener('input', function() {
+                document.getElementById('centerYValue').textContent = this.value + '%';
+                updateGradient();
+            });
+
+            // Conic controls
+            document.getElementById('conicRotation').addEventListener('input', function() {
+                document.getElementById('conicRotationValue').textContent = this.value + '°';
+                updateGradient();
+            });
+
+            // Output tabs
+            document.querySelectorAll('.output-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentOutputType = this.getAttribute('data-output');
+                    updateCodeOutput();
+                });
+            });
+
+            // Preview area click
+            document.getElementById('previewArea').addEventListener('click', copyCode);
+        }
+
+        function toggleGradientControls() {
+            document.getElementById('linearControls').style.display = gradientType === 'linear' ? 'block' : 'none';
+            document.getElementById('radialControls').style.display = gradientType === 'radial' ? 'block' : 'none';
+            document.getElementById('conicControls').style.display = gradientType === 'conic' ? 'block' : 'none';
+        }
+
+        function renderColorStops() {
+            const container = document.getElementById('colorStops');
+            container.innerHTML = '';
+
+            colorStops.forEach((stop, index) => {
+                const stopElement = document.createElement('div');
+                stopElement.className = 'color-stop';
+                stopElement.innerHTML = `
+                    <input type="color" class="color-input" value="${stop.color}" onchange="updateColorStop(${index}, 'color', this.value)">
+                    <input type="number" class="position-input" value="${stop.position}" min="0" max="100" placeholder="Position %" onchange="updateColorStop(${index}, 'position', this.value)">
+                    ${colorStops.length > 2 ? `<button class="remove-color" onclick="removeColorStop(${index})"><i class="fas fa-times"></i></button>` : '<div style="width: 30px;"></div>'}
+                `;
+                container.appendChild(stopElement);
+            });
+        }
+
+        function addColorStop() {
+            const newPosition = colorStops.length > 0 ? 
+                Math.max(...colorStops.map(s => s.position)) + 10 : 50;
+            
+            colorStops.push({
+                color: getRandomColor(),
+                position: Math.min(newPosition, 100)
+            });
+            
+            renderColorStops();
+            updateGradient();
+        }
+
+        function removeColorStop(index) {
+            if (colorStops.length > 2) {
+                colorStops.splice(index, 1);
+                renderColorStops();
+                updateGradient();
+            }
+        }
+
+        function updateColorStop(index, property, value) {
+            if (property === 'position') {
+                value = Math.max(0, Math.min(100, parseInt(value) || 0));
+            }
+            colorStops[index][property] = value;
+            updateGradient();
+        }
+
+        function renderPresets() {
+            const container = document.getElementById('presetGrid');
+            container.innerHTML = '';
+
+            presetGradients.forEach((preset, index) => {
+                const presetElement = document.createElement('div');
+                presetElement.className = 'preset-item';
+                presetElement.title = preset.name;
+                
+                const gradientCSS = `linear-gradient(90deg, ${preset.colors.map((color, i) => 
+                    `${color} ${(i * (100 / (preset.colors.length - 1)))}%`
+                ).join(', ')})`;
+                
+                presetElement.style.background = gradientCSS;
+                presetElement.addEventListener('click', () => applyPreset(preset));
+                container.appendChild(presetElement);
+            });
+        }
+
+        function applyPreset(preset) {
+            colorStops = preset.colors.map((color, index) => ({
+                color: color,
+                position: index * (100 / (preset.colors.length - 1))
+            }));
+            
+            renderColorStops();
+            updateGradient();
+        }
+
+        function updateGradient() {
+            const css = generateGradientCSS();
+            document.getElementById('previewArea').style.background = css;
+            updateCodeOutput();
+        }
+
+        function generateGradientCSS() {
+            const sortedStops = [...colorStops].sort((a, b) => a.position - b.position);
+            const stopStrings = sortedStops.map(stop => `${stop.color} ${stop.position}%`);
+
+            let gradient = '';
+            
+            if (gradientType === 'linear') {
+                const angle = document.getElementById('customAngle').value || 
+                             document.getElementById('directionSelect').value;
+                gradient = `linear-gradient(${angle}, ${stopStrings.join(', ')})`;
+            } else if (gradientType === 'radial') {
+                const shape = document.getElementById('radialShape').value;
+                const size = document.getElementById('radialSize').value;
+                const centerX = document.getElementById('centerX').value;
+                const centerY = document.getElementById('centerY').value;
+                gradient = `radial-gradient(${shape} ${size} at ${centerX}% ${centerY}%, ${stopStrings.join(', ')})`;
+            } else if (gradientType === 'conic') {
+                const rotation = document.getElementById('conicRotation').value;
+                gradient = `conic-gradient(from ${rotation}deg, ${stopStrings.join(', ')})`;
+            }
+
+            return gradient;
+        }
+
+        function updateCodeOutput() {
+            const gradient = generateGradientCSS();
+            let output = '';
+
+            switch (currentOutputType) {
+                case 'css':
+                    output = `.gradient {
+  background: ${gradient};
+}`;
+                    break;
+                case 'scss':
+                    output = `$gradient: ${gradient};
+
+.gradient {
+  background: $gradient;
+}`;
+                    break;
+                case 'background':
+                    output = `background: ${gradient};`;
+                    break;
+            }
+
+            document.getElementById('codeOutput').textContent = output;
+        }
+
+        function randomizeGradient() {
+            const numColors = Math.floor(Math.random() * 3) + 2; // 2-4 colors
+            colorStops = [];
+
+            for (let i = 0; i < numColors; i++) {
+                colorStops.push({
+                    color: getRandomColor(),
+                    position: (i / (numColors - 1)) * 100
+                });
+            }
+
+            // Randomize type occasionally
+            if (Math.random() < 0.3) {
+                const types = ['linear', 'radial', 'conic'];
+                gradientType = types[Math.floor(Math.random() * types.length)];
+                
+                document.querySelectorAll('.gradient-type').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-type') === gradientType);
+                });
+                
+                toggleGradientControls();
+            }
+
+            renderColorStops();
+            updateGradient();
+        }
+
+        function getRandomColor() {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = Math.floor(Math.random() * 50) + 50; // 50-100%
+            const lightness = Math.floor(Math.random() * 40) + 40; // 40-80%
+            return hslToHex(hue, saturation, lightness);
+        }
+
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function copyCode() {
+            const codeOutput = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(codeOutput).then(() => {
+                showNotification('Code copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy code', 'error');
+            });
+        }
+
+        function downloadCSS() {
+            const codeOutput = document.getElementById('codeOutput').textContent;
+            const blob = new Blob([codeOutput], { type: 'text/css' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gradient.css';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportAsImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 800;
+            canvas.height = 600;
+
+            // Create gradient
+            let gradient;
+            const sortedStops = [...colorStops].sort((a, b) => a.position - b.position);
+
+            if (gradientType === 'linear') {
+                const angle = parseFloat(document.getElementById('customAngle').value || 
+                                       document.getElementById('directionSelect').value || '90') * Math.PI / 180;
+                const x1 = 400 - Math.cos(angle + Math.PI/2) * 400;
+                const y1 = 300 - Math.sin(angle + Math.PI/2) * 300;
+                const x2 = 400 + Math.cos(angle + Math.PI/2) * 400;
+                const y2 = 300 + Math.sin(angle + Math.PI/2) * 300;
+                gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+            } else if (gradientType === 'radial') {
+                const centerX = (parseFloat(document.getElementById('centerX').value) / 100) * 800;
+                const centerY = (parseFloat(document.getElementById('centerY').value) / 100) * 600;
+                gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 400);
+            } else {
+                // Fallback to linear for conic
+                gradient = ctx.createLinearGradient(0, 0, 800, 0);
+            }
+
+            sortedStops.forEach(stop => {
+                gradient.addColorStop(stop.position / 100, stop.color);
+            });
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+
+            // Download
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gradient.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        function shareGradient() {
+            const gradientData = {
+                type: gradientType,
+                stops: colorStops,
+                settings: {
+                    angle: document.getElementById('customAngle').value || document.getElementById('directionSelect').value,
+                    radialShape: document.getElementById('radialShape').value,
+                    radialSize: document.getElementById('radialSize').value,
+                    centerX: document.getElementById('centerX').value,
+                    centerY: document.getElementById('centerY').value,
+                    conicRotation: document.getElementById('conicRotation').value
+                }
+            };
+
+            const encoded = btoa(JSON.stringify(gradientData));
+            const url = `${window.location.origin}${window.location.pathname}?gradient=${encoded}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'CSS Gradient',
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('Gradient URL copied to clipboard!', 'success');
+                });
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Show notification
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+
+            // Hide notification
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Load gradient from URL if present
+        function loadFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gradientParam = urlParams.get('gradient');
+            
+            if (gradientParam) {
+                try {
+                    const gradientData = JSON.parse(atob(gradientParam));
+                    
+                    gradientType = gradientData.type;
+                    colorStops = gradientData.stops;
+                    
+                    // Update UI
+                    document.querySelectorAll('.gradient-type').forEach(btn => {
+                        btn.classList.toggle('active', btn.getAttribute('data-type') === gradientType);
+                    });
+                    
+                    // Apply settings
+                    const settings = gradientData.settings;
+                    if (settings.angle) {
+                        if (isNaN(settings.angle)) {
+                            document.getElementById('directionSelect').value = settings.angle;
+                        } else {
+                            document.getElementById('customAngle').value = settings.angle;
+                        }
+                    }
+                    
+                    document.getElementById('radialShape').value = settings.radialShape || 'ellipse';
+                    document.getElementById('radialSize').value = settings.radialSize || 'farthest-corner';
+                    document.getElementById('centerX').value = settings.centerX || '50';
+                    document.getElementById('centerY').value = settings.centerY || '50';
+                    document.getElementById('conicRotation').value = settings.conicRotation || '0';
+                    
+                    // Update value displays
+                    document.getElementById('centerXValue').textContent = (settings.centerX || '50') + '%';
+                    document.getElementById('centerYValue').textContent = (settings.centerY || '50') + '%';
+                    document.getElementById('conicRotationValue').textContent = (settings.conicRotation || '0') + '°';
+                    
+                    toggleGradientControls();
+                    renderColorStops();
+                    updateGradient();
+                } catch (error) {
+                    console.error('Failed to load gradient from URL:', error);
+                }
+            }
+        }
+
+        // Load from URL on page load
+        window.addEventListener('load', loadFromURL);
+    </script>
+</body>
+</html>
